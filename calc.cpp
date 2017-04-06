@@ -10,6 +10,7 @@ extern "C" {
   double calc(const char * str, int * status);
   #ifdef __cplusplus
   }
+  #endif
 class Steck {
 	int size;
 	char massiv[30];
@@ -136,7 +137,7 @@ double calc(const char * str, int * status) {
 		}
 	return result;
 }
-int main(int argc , char argv[])
+int main(int argc , char *argv[])
 	{
 	int * status;
 	double result;
