@@ -11,11 +11,12 @@ extern "C" {
   #ifdef __cplusplus
   }
   #endif
-class Steck {
+class Operators {
+	double result;
 	int size;
 	char massiv[30];
   public:
-	Steck(){
+	Operators(){
 		size=0;
 		for (int i = 0; i < 30; ++i)
 			{
@@ -36,108 +37,135 @@ class Steck {
 	int Check_Steck(){
 		return massiv[size-1];
 		}
-	};
-int Check_Status(int stat)
-	{
-	int * status;
-	*status+=stat;
-	return *status;
-	}
-int Check_Simbol(char simbol)
-	{
-	if (simbol=='(')return 1;
-	if (simbol=='+'||simbol=='-')return 2;
-	if (simbol=='*'||simbol=='/')return 3;
-	if (simbol=='^')return 4;
-	if (simbol==')')return 5;
-	else {return 0;} 
-	}
-double Math_Operations(char oper,Steck & operands){
-	double result;
-	double a,b;
-	b=(operands.Pop());
-	a=(operands.Pop());
-	if (oper=='+') result=a+b;
-	if (oper=='-') result=a-b;
-	if (oper=='*') result=a*b;
-	if (oper=='/') result=a/b;
-	if (oper=='^') result=pow(a,b);
-	return result;
-	}
-double calculation(const char * str){
-	Steck operands;
-	Steck operators;
-	char * p;
-	*p=*str;
-	char op;
-	double chislo=0.0;
-	if(p==0)
+	int Check_Simbol(char simbol)
 		{
-		Check_Status(1);
-		return 1;
+		if (simbol=='(')return 1;
+		if (simbol=='+'||simbol=='-')return 2;
+		if (simbol=='*'||simbol=='/')return 3;
+		if (simbol=='^')return 4;
+		if (simbol==')')return 5;
+		else {return 0;} 
 		}
-	while(str!=0)
+	double Math_Operations(char oper,double b,double a){
+		if (oper=='+') result=a+b;
+		if (oper=='-') result=a-b;
+		if (oper=='*') result=a*b;
+		if (oper=='/') result=a/b;
+		if (oper=='^') result=pow(a,b);
+		return result;
+		}
+	};
+class Operands {
+	char * p;
+	int size;
+	double massiv[30];
+	int * status;
+	char op;
+	char simb;
+	double chislo;
+  public:
+	Operands(){
+		simb=0;
+		status=new int;
+		chislo=0.0;
+		size=0;
+		for (int i = 0; i < 30; ++i)
+			{
+			massiv[i]=0.0;
+			}
+		}
+	void Push(double simbol){
+		massiv[size]=simbol;
+		size++;
+		}
+	char Pop(){
+		size--;
+		return massiv[size];
+		}
+	int Size(){
+		return size;
+		}
+	int Check_Steck(){
+		return massiv[size-1];
+		}
+	int Check_Status(int stat)
 		{
-	        chislo=atof(p);
-		if(chislo!=0.0)
+		*status+=stat;
+		return *status;
+		}
+	double calculation(const char * str,Operators & operators){
+		*p=*str;
+		if(p==0)
 			{
-			operands.Push(chislo);
+			Check_Status(1);
+			return 1;
 			}
-		p= strpbrk (p, "+-*/^()");
-		op=*p;
-		if (operators.Size()==0)
+		while(str!=0)
 			{
-			operators.Push(op);
-			p++;
-			continue;
-			}
-		if (Check_Simbol(op)!=5 && (Check_Simbol(op)>operators.Check_Steck()))
-			{
-			operators.Push(op);
-			p++;
-			continue;
-			}
-		if (Check_Simbol(op)<=operators.Check_Steck() && Check_Simbol(op)!=1)
-			{
-			operands.Push(Math_Operations(operators.Pop(), operators));
-			continue;
-			}
-		if (Check_Simbol(op)==1)
+		        chislo=atof(p);
+			if(chislo!=0.0)
+				{
+				Push(chislo);
+				}
+			p= strpbrk (p, "+-*/^()");
+			op=*p;
+			if (operators.Size()==0)
 				{
 				operators.Push(op);
 				p++;
 				continue;
 				}
-		if (Check_Simbol(op)==5)
-			{
-			char a=0;
-			while(1)
+			if (operators.Check_Simbol(op)!=5 && (operators.Check_Simbol(op)>operators.Check_Steck()))
 				{
-				a=operators.Pop();
-				if (a==')')break;
-				operands.Push(Math_Operations(a, operators));
+				operators.Push(op);
+				p++;
+				continue;
+				}
+			if (operators.Check_Simbol(op)<=operators.Check_Steck() && operators.Check_Simbol(op)!=1)
+				{
+				Push(operators.Math_Operations(operators.Pop(), Pop(),Pop()));
+				p++;
+				continue;
+				}
+			if (operators.Check_Simbol(op)==1)
+					{
+					operators.Push(op);
+					p++;
+					continue;
+					}
+			if (operators.Check_Simbol(op)==5)
+				{
+				while(1)
+					{
+					simb=operators.Pop();
+					if (simb==')')break;
+					Push(operators.Math_Operations(simb, Pop(),Pop()));
+					}
+				p++;
 				}
 			}
+		while(operators.Size()!=0)
+			{
+			Push(operators.Math_Operations(operators.Pop(), Pop(),Pop()));
+			}
+		return Check_Steck();
 		}
-	while(operators.Size()!=0)
-		{
-		operands.Push(Math_Operations(operators.Pop(), operators));
-		}
-	return operands.Check_Steck();
-	}
+	};
 double calc(const char * str, int * status) {
-	double result=calculation(str);
-	if(Check_Status(0)==1)
+	Operators operators;
+	Operands operands;
+	double result=operands.calculation(str,operators);
+	if(operands.Check_Status(0)==1)
 		{
 		*status=1;
 		}
-	if(calculation(str)==0) 
+	if(operands.Check_Status(0)==0) 
 		{
 		*status=0;
 		}
 	return result;
 }
-int main(int argc , char *argv[])
+int main(int argc ,char *argv[])
 	{
 	int * status;
 	double result;
