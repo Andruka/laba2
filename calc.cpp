@@ -50,7 +50,11 @@ class Steck {
 		return size_operands;
 		}
 	int Check_operators(){
-		return operators[size_operators-1];
+		if (operators[size_operators-1]=='(')return 1;
+		if (operators[size_operators-1]=='+'||operators[size_operators-1]=='-')return 2;
+		if (operators[size_operators-1]=='*'||operators[size_operators-1]=='/')return 3;
+		if (operators[size_operators-1]=='^')return 4;
+		if (operators[size_operators-1]==')')return 5;
 		}
 	int Check_operands(){
 		return operands[size_operands-1];
@@ -84,7 +88,7 @@ class Calculator{
 		if (oper=='-') result=a-b;
 		if (oper=='*') result=a*b;
 		if (oper=='/') result=a/b;
-		if (oper=='^') result=pow(a,b);
+		if (oper=='^') result=pow(b,a);
 		return result;
 		}
 	int Check_Status(int stat)
@@ -93,12 +97,12 @@ class Calculator{
 		return *status;
 		}
 	double calculation(const char * str){
-		if(str==0)
+		if(str==NULL)
 			{
 			Check_Status(1);
 			return 1;
 			}
-		while(str!=0)
+		while(str!=NULL)
 			{
 		        chislo=atof(str);
 			if(chislo!=0.0)
@@ -106,6 +110,9 @@ class Calculator{
 				steck.Push_operands(chislo);
 				}
 			str= strpbrk (str, "+-*/^()");
+			if (str == NULL){
+				break;
+				}
 			op=*str;
 			if (steck.Size_operators()==0)
 				{
@@ -136,7 +143,7 @@ class Calculator{
 				while(1)
 					{
 					simb=steck.Pop_operators();
-					if (simb==')')break;
+					if (simb=='(')break;
 					steck.Push_operands(Math_Operations(simb, steck.Pop_operands(),steck.Pop_operands()));
 					}
 				str++;
@@ -173,4 +180,4 @@ int main(int argc ,char *argv[])
 		cout<<"Calculation complete!"<<endl;
 		cout<<result<<endl;
 		}
-	}
+}
