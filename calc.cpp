@@ -89,12 +89,12 @@ class Calculator{
 		if (simbol==')')return 5;
 		else {return 0;} 
 		}
-	double Math_Operations(char oper,double b,double a){
+	double Math_Operations(char oper,double a,double b){
 		if (oper=='+') result=a+b;
 		if (oper=='-') result=a-b;
 		if (oper=='*') result=a*b;
 		if (oper=='/') result=a/b;
-		if (oper=='^') result=pow(b,a);
+		if (oper=='^') result=pow(a,b);
 		return result;
 		}
 	int Check_Status(int stat)
