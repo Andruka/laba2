@@ -29,18 +29,22 @@ class Steck {
 		}
 	void Push_operators(char simbol){
 		operators[size_operators]=simbol;
+		cout<<simbol<<"\t"<<"упал на вершину стека операторов"<<endl;
 		size_operators++;
 		}
 	void Push_operands(double chislo){
 		operands[size_operands]=chislo;
+		cout<<chislo<<"\t"<<"упал на вершину стека чилел"<<endl;
 		size_operands++;
 		}
 	char Pop_operators(){
 		size_operators--;
+		cout<<operators[size_operators]<<"\t"<<"вытолкнут из стека операторов"<<endl;
 		return operators[size_operators];
 		}
 	char Pop_operands(){
 		size_operands--;
+		cout<<operands[size_operands]<<"\t"<<"вытолкнуто из стека чисел"<<endl;
 		return operands[size_operands];
 		}
 	int Size_operators(){
@@ -62,6 +66,7 @@ class Steck {
 	};
 class Calculator{
 	Steck steck;
+	int flag;
 	int * status;
 	double result,chislo;
 	char op;
@@ -69,6 +74,7 @@ class Calculator{
   public:
 	Calculator(){
 		status=new int;
+		flag=0;
 		result=0.0;
 		chislo=0.0;
 		op=0;
@@ -104,10 +110,14 @@ class Calculator{
 			}
 		while(str!=NULL)
 			{
-		        chislo=atof(str);
-			if(chislo!=0.0)
+			if(flag==1)flag=0;
+			else
 				{
-				steck.Push_operands(chislo);
+		        	chislo=atof(str);
+				if(chislo!=0.0)
+					{
+					steck.Push_operands(chislo);
+					}
 				}
 			str= strpbrk (str, "+-*/^()");
 			if (str == NULL){
@@ -129,7 +139,7 @@ class Calculator{
 			if (Check_Simbol(op)<=steck.Check_operators() && Check_Simbol(op)!=1)
 				{
 				steck.Push_operands(Math_Operations(steck.Pop_operators(), steck.Pop_operands(),steck.Pop_operands()));
-				str++;
+				flag=1;
 				continue;
 				}
 			if (Check_Simbol(op)==1)
