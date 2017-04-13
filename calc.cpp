@@ -42,7 +42,7 @@ class Steck {
 		cout<<operators[size_operators]<<"\t"<<"вытолкнут из стека операторов"<<endl;
 		return operators[size_operators];
 		}
-	char Pop_operands(){
+	double Pop_operands(){
 		size_operands--;
 		cout<<operands[size_operands]<<"\t"<<"вытолкнуто из стека чисел"<<endl;
 		return operands[size_operands];
@@ -54,13 +54,12 @@ class Steck {
 		return size_operands;
 		}
 	int Check_operators(){
-		if (operators[size_operators-1]=='(')return 1;
-		if (operators[size_operators-1]=='+'||operators[size_operators-1]=='-')return 2;
-		if (operators[size_operators-1]=='*'||operators[size_operators-1]=='/')return 3;
-		if (operators[size_operators-1]=='^')return 4;
-		if (operators[size_operators-1]==')')return 5;
+		if (operators[size_operators-1]=='+'||operators[size_operators-1]=='-')return 1;
+		if (operators[size_operators-1]=='*'||operators[size_operators-1]=='/')return 2;
+		if (operators[size_operators-1]=='^')return 3;
+		else{return 0;}
 		}
-	int Check_operands(){
+	double Check_operands(){
 		return operands[size_operands-1];
 		}
 	};
@@ -69,7 +68,7 @@ class Calculator{
 	int * status;
 	double result,chislo;
 	char op,oper;
-	char simb;
+	int simb;
 	double a ,b;
   public:
 	Calculator(){
@@ -81,12 +80,9 @@ class Calculator{
 		}
 	int Check_Simbol(char simbol)
 		{
-		if (simbol=='(')return 1;
-		if (simbol=='+'||simbol=='-')return 2;
-		if (simbol=='*'||simbol=='/')return 3;
-		if (simbol=='^')return 4;
-		if (simbol==')')return 5;
-		else {return 0;} 
+		if (simbol=='+'||simbol=='-')return 1;
+		if (simbol=='*'||simbol=='/')return 2;
+		if (simbol=='^')return 3;
 		}
 	double Math_Operations(){
 		oper=steck.Pop_operators();
@@ -95,14 +91,33 @@ class Calculator{
 		if (oper=='+') result=a+b;
 		if (oper=='-') result=a-b;
 		if (oper=='*') result=a*b;
-		if (oper=='/') result=a/b;
-		if (oper=='^') result=pow(a,b);
+		if (oper=='/') result=b/a;
+		if (oper=='^') result=pow(b,a);
 		steck.Push_operands(result);
 		}
 	int Check_Status(int stat)
 		{
 		*status+=stat;
 		return *status;
+		}
+	int Skobki()
+		{
+			if (op=='(')
+					{
+					steck.Push_operators(op);
+					return 1;
+					}
+			if (op==')')
+				{
+				while(1)
+					{
+					simb=steck.Check_operators();
+					if (simb==0){steck.Pop_operators();break;}
+					Math_Operations();
+					}
+				return 1;
+				}
+		return 0;
 		}
 	double calculation(const char * str){
 		if(str==NULL)
@@ -128,38 +143,26 @@ class Calculator{
 				break;
 				}
 			op=*str;
+			if(Skobki()==1)
+				{
+				str++;
+				continue;
+				}
 			if (steck.Size_operators()==0)
 				{
 				steck.Push_operators(op);
 				str++;
 				continue;
 				}
-			if (Check_Simbol(op)!=5 && (Check_Simbol(op)>steck.Check_operators()))
+			if (Check_Simbol(op)>steck.Check_operators())
 				{
 				steck.Push_operators(op);
 				str++;
 				continue;
 				}
-			if (Check_Simbol(op)<=steck.Check_operators() && Check_Simbol(op)!=1)
+			if (Check_Simbol(op)<=steck.Check_operators())
 				{
 				Math_Operations();
-				continue;
-				}
-			if (Check_Simbol(op)==1)
-					{
-					steck.Push_operators(op);
-					str++;
-					continue;
-					}
-			if (Check_Simbol(op)==5)
-				{
-				while(1)
-					{
-					simb=steck.Check_operators();
-					if (simb==1){steck.Pop_operators();break;}
-					Math_Operations();
-					}
-				str++;
 				continue;
 				}
 			}
