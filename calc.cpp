@@ -66,15 +66,14 @@ class Steck {
 	};
 class Calculator{
 	Steck steck;
-	int flag;
 	int * status;
 	double result,chislo;
-	char op;
+	char op,oper;
 	char simb;
+	double a ,b;
   public:
 	Calculator(){
 		status=new int;
-		flag=0;
 		result=0.0;
 		chislo=0.0;
 		op=0;
@@ -89,13 +88,16 @@ class Calculator{
 		if (simbol==')')return 5;
 		else {return 0;} 
 		}
-	double Math_Operations(char oper,double a,double b){
+	double Math_Operations(){
+		oper=steck.Pop_operators();
+		a=steck.Pop_operands();
+		b=steck.Pop_operands();
 		if (oper=='+') result=a+b;
 		if (oper=='-') result=a-b;
 		if (oper=='*') result=a*b;
 		if (oper=='/') result=a/b;
 		if (oper=='^') result=pow(a,b);
-		return result;
+		steck.Push_operands(result);
 		}
 	int Check_Status(int stat)
 		{
@@ -110,14 +112,16 @@ class Calculator{
 			}
 		while(str!=NULL)
 			{
-			if(flag==1)flag=0;
-			else
+			if(*str=='0'||*str=='1'||*str=='2'||*str=='3'||*str=='4'||*str=='5'||*str=='6'||*str=='7'||*str=='8'||*str=='9')
+		        	{
+				chislo=atof(str);
+				steck.Push_operands(chislo);
+				}
+			if((*str=='-')&&(*(str-1)!='0'||*(str-1)!='1'||*(str-1)!='2'||*(str-1)!='3'||*(str-1)!='4'||*(str-1)!='5'||*(str-1)!='6'||*(str-1)!='7'||*(str-1)!='8'||*(str-1)!='9'))
 				{
-		        	chislo=atof(str);
-				if(chislo!=0.0)
-					{
-					steck.Push_operands(chislo);
-					}
+				chislo=atof(str);
+				steck.Push_operands(chislo);
+				str++;
 				}
 			str= strpbrk (str, "+-*/^()");
 			if (str == NULL){
@@ -138,8 +142,7 @@ class Calculator{
 				}
 			if (Check_Simbol(op)<=steck.Check_operators() && Check_Simbol(op)!=1)
 				{
-				steck.Push_operands(Math_Operations(steck.Pop_operators(), steck.Pop_operands(),steck.Pop_operands()));
-				flag=1;
+				Math_Operations();
 				continue;
 				}
 			if (Check_Simbol(op)==1)
@@ -152,16 +155,17 @@ class Calculator{
 				{
 				while(1)
 					{
-					simb=steck.Pop_operators();
-					if (simb=='(')break;
-					steck.Push_operands(Math_Operations(simb, steck.Pop_operands(),steck.Pop_operands()));
+					simb=steck.Check_operators();
+					if (simb==1){steck.Pop_operators();break;}
+					Math_Operations();
 					}
 				str++;
+				continue;
 				}
 			}
 		while(steck.Size_operators()!=0)
 			{
-			steck.Push_operands(Math_Operations(steck.Pop_operators(), steck.Pop_operands(),steck.Pop_operands()));
+			Math_Operations();
 			}
 		return steck.Check_operands();
 		}	
